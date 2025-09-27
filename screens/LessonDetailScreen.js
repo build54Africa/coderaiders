@@ -16,8 +16,13 @@ import { callAI } from "../services/ai";
 
 export default function LessonDetailScreen({ route, navigation }) {
   const { lesson } = route.params;
+  const [language, setLanguage] = useState("en"); // 🌐 Default language
   const [message, setMessage] = useState("");
   const [conversation, setConversation] = useState([]);
+
+  const toggleLanguage = () => {
+    setLanguage(language === "en" ? "sw" : "en");
+  };
 
   const sendMessage = async () => {
     if (!message.trim()) return;
@@ -35,6 +40,22 @@ export default function LessonDetailScreen({ route, navigation }) {
     }
 
     setMessage("");
+  };
+
+  // Hardcoded Swahili translations for your lessons
+  const contentSwahili = {
+    "1": `Kilimo: Kukuza Chakula kwa Wote
+
+Kilimo ni jinsi watu wanavyopanda chakula na kuhudumia wanyama. Wakulima wanapanda mbegu ili kukuza mazao kama mahindi, maharagwe, mchele, na mboga. Mazao haya yanatupa chakula tunachokula kila siku...`,
+    "2": `Ufundi wa Mbao: Kujenga kwa Mbao
+
+Ufundi wa mbao ni kazi ya kutengeneza vitu kwa kutumia mbao. Mtu anayefanya kazi hii huitwa fundi mbao. Wanafundi hujenga nyumba, meza, viti, milango, na vitu vingine...`,
+    "3": `Ubunifu wa Maji: Kuleta Maji Nyumbani
+
+Ubungaji wa bomba ni kazi ya kusafirisha maji ndani na nje ya majengo. Mtu anayefanya kazi hii huitwa fundi mabomba. Wanafundi wanasaidia kupata maji safi ya kunywa, kuosha, kupika, na kusafisha...`,
+    "4": `Umeme: Nguvu kwa Maisha Yetu
+
+Umeme ni nguvu inayowasha taa, TV, friji, na simu. Unatusaidia kupika chakula, kudumisha nyumba zetu kuwa na joto au baridi, na kutumia mashine...`,
   };
 
   return (
@@ -64,12 +85,25 @@ export default function LessonDetailScreen({ route, navigation }) {
             />
           </View>
 
-          {/* Lesson Title & Description */}
-          <Text style={styles.title}>{lesson.title}</Text>
+          {/* Lesson Title & Language Toggle */}
+          <View style={styles.headerRow}>
+            <Text style={styles.title}>{lesson.title}</Text>
+            <TouchableOpacity style={styles.langButton} onPress={toggleLanguage}>
+              <Text style={styles.langButtonText}>
+                {language === "en" ? "🇰🇪 Swahili" : "🇬🇧 English"}
+              </Text>
+            </TouchableOpacity>
+          </View>
+
+          {/* Lesson Description */}
           <Text style={styles.description}>{lesson.description}</Text>
 
           {/* Lesson Content */}
-          <Text style={styles.content}>{lesson.content}</Text>
+          <Text style={styles.content}>
+            {language === "en"
+              ? lesson.content
+              : contentSwahili[lesson.id] || lesson.content}
+          </Text>
 
           {/* Conversation history */}
           <View style={styles.chatContainer}>
@@ -116,7 +150,20 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
   video: { flex: 1 },
-  title: { fontSize: 22, fontWeight: "bold", marginTop: 5 },
+  headerRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginVertical: 10,
+  },
+  langButton: {
+    backgroundColor: "#007bff",
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 20,
+  },
+  langButtonText: { color: "#fff", fontWeight: "600" },
+  title: { fontSize: 22, fontWeight: "bold" },
   description: { fontSize: 16, marginTop: 10, color: "#444" },
   content: { fontSize: 16, marginTop: 10, lineHeight: 22, color: "#333" },
   chatContainer: { marginTop: 20 },
